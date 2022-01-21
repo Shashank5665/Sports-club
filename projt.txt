@@ -65,6 +65,10 @@ coach details -coach name
 
 admin pages
 
+admin page
+	name
+	age
+	
 create tournement page
 	add tournent
 	tournmwnt name
