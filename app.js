@@ -1,31 +1,62 @@
+//required npm packages and setting variables
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const con = require("./server");
+const { disable } = require("express/lib/application");
 const port = 3300;
-const addUserData = require("./controllers/controller.js");
-const req = require("express/lib/request");
-
-//middlewares
-app.set("view engine", "html");
-app.engine("html", require("ejs").renderFile);
+var success_b_id;
+var success_sports_name;
+var success_username;
+var success_t_id = null;
+var success_b_coach;
+var admin_username = "main_admin";
+var admin_password = "main_password";
+//MIDDLEWARES
+app.set("view engine", "ejs");
+app.engine("ejs", require("ejs").renderFile);
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public/css"));
+app.use(express.static("public"));
 app.use(bodyParser.json({ type: "application/json" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/signup", (req, res) => {
-  res.render("ssclubsignup");
+//ROUTES
+app.get("/home", (req, res) => {
+  con.query("select * from sports;", (err, result) => {
+    if (err) console.log(err);
+    res.render("home", {
+      s_details: result,
+    });
+  });
 });
+
+//To display the signup page
+app.get("/signup", (req, res) => {
+  res.render("signup");
+});
+//To display the tournament page, where admin can add new tournaments
+app.get("/add-tour", (req, res) => {
+  res.render("add-tour");
+});
+
+//To add the tournaments
+app.post("/add-tour", async (req, res) => {
+  await con.query(
+    `insert into tournaments values(${req.body.t_id},"${req.body.t_name}","${req.body.t_type}","${req.body.t_duration}","${req.body.t_date}","${req.body.t_day}","${req.body.t_venue}");`,
+    (err, result) => {
+      if (err) {
+        throw err;
+      } else {
+        console.log("1 record inserted");
+      }
+    }
+  );
+  res.redirect("/admin-tournaments");
+  res.end();
+});
+
+//To sign-up the new users
 app.post("/signup", async (req, res) => {
-  // var fullname = req.body.fullname;
-  // var email = req.body.email;
-  // var address = req.body.address;
-  // var dob = req.body.dob;
-  // var phonenumber = req.body.phonenumber;
-  // var username = req.body.username;
-  // var password = req.body.password;
-  // console.dir(con);
   await con.query(
     "insert into users values('" +
       req.body.fullname +
@@ -43,12 +74,253 @@ app.post("/signup", async (req, res) => {
       req.body.password +
       "')",
     (err, result) => {
-      if (err) console.log(err);
-      console.log("1 record inserted");
+      if (err) {
+        throw err;
+      } else {
+        console.log("1 record inserted");
+      }
     }
   );
-  res.send("Record inserted");
+  res.redirect("/login");
+  res.end();
 });
+
+//To display login page
+var uname;
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+//To login the existing users
+app.post("/login", async (req, res) => {
+  uname = req.body.username;
+  success_username = uname;
+  var pass = req.body.password;
+  if (uname == "main_admin" && pass == "main_password") {
+    res.redirect("/admin");
+  } else {
+    con.query(
+      `select * from users where username="${uname}"`,
+      async (err, result) => {
+        if (err) {
+          throw err;
+        }
+        if (result[0].password == pass) {
+          success_username = uname;
+          res.redirect(`/sports/${uname}`);
+        } else {
+          res.send("Username and password didn't match, refresh and try again");
+        }
+      }
+    );
+  }
+});
+
+//To display the batch page of a the particular sport
+app.get("/batch/:batchId", async (req, res) => {
+  await con.query(
+    `select * from batch where b_sport="${req.params.batchId}"`,
+    (err, result) => {
+      if (err) console.log(err);
+      console.log(result);
+      success_b_id = result[0].b_id;
+      success_sports_name = req.params.batchId;
+      res.render("batch", {
+        b_details: result,
+        sports_name: req.params.batchId,
+      });
+    }
+  );
+});
+
+//To show the sports page when a user is not logged-in
+app.get("/sports", async (req, res) => {
+  await con.query("select * from sports;", (err, result) => {
+    if (err) console.log(err);
+    res.render("sports", {
+      s_details: result,
+      myprofile: req.params.username,
+      username: "",
+      Login: "Login",
+      Register: "Signup",
+      logout: "",
+    });
+  });
+});
+
+//To display the sports page when the user is logged-in
+app.get("/sports/:username", async (req, res) => {
+  await con.query("select * from sports;", (err, result) => {
+    if (err) console.log(err);
+    res.render("sports", {
+      username: uname,
+      s_details: result,
+      myprofile: req.params.username,
+      Login: "",
+      Register: "",
+      logout: "Logout",
+    });
+  });
+});
+
+//To display the users to the admin
+app.get("/admin-users", async (req, res) => {
+  await con.query("select * from users;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    res.render("admin-users", {
+      members: result,
+    });
+  });
+});
+
+//Display the admin page
+app.get("/admin", async (req, res) => {
+  await con.query("select * from users;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    res.render("admin");
+  });
+});
+
+//Not required
+app.get("/admincoach", async (req, res) => {
+  await con.query("select * from coach;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    res.render("admincoach");
+  });
+});
+
+//To display the tournament section in the admin dashboard
+app.get("/admintournment", async (req, res) => {
+  await con.query("select * from tournaments;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    res.render("admintournment");
+  });
+});
+
+//To view the tournaments by the admin in the admin dashboard
+app.get("/admin-tournaments", async (req, res) => {
+  con.query("select * from tournaments;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    res.render("admin-tournaments", {
+      tournament: result,
+    });
+  });
+});
+
+// app.get("/delete-tournaments", async (req, res) => {
+//   con.query("select * from tournaments;", (err, result) => {
+//     if (err) console.log(err);
+//     console.log(result);
+//     res.render("admin-tournaments", {
+//       tournament: result,
+//     });
+//   });
+// });
+
+// app.get("/delete-tournaments", async (req, res) => {
+//   con.query(
+//     `delete * from tournaments where t_name=${this.Attr("class")};`,
+//     (err, result) => {
+//       if (err) console.log(err);
+//       console.log(result);
+//       res.redirect("/admin-tournaments");
+//     }
+//   );
+// });
+
+//To display the tournaments
+app.get("/tournaments", async (req, res) => {
+  await con.query("select * from tournaments;", (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    if (uname == null) {
+      res.render("tournaments", {
+        t_details: result,
+        username: uname,
+        myprofile: req.params.username,
+        Login: "Login",
+        Register: "Signup",
+      });
+    } else {
+      res.render("tournaments", {
+        t_details: result,
+        username: uname,
+        myprofile: uname,
+        Login: "",
+        Register: "",
+      });
+    }
+  });
+});
+
+//To display the profile of a user
+var user;
+app.get("/profile/:username", (req, res) => {
+  con.query(`select * from users where username="${uname}";`, (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
+    var user = result[0];
+    res.render("myprofile", {
+      myprofile: user.username,
+      fullname: user.fullname,
+      username: user.username,
+      mobile: user.phnumber,
+      address: user.address,
+      email: user.email,
+      dob: user.dob,
+      Login: "",
+      Register: "",
+      sports_name: user.s_name,
+      tour_name: "",
+    });
+  });
+});
+const viewUsers = () => {
+  document.querySelector(".view-users").addEventListener(() => {
+    app.get("/admin-users", async (req, res) => {
+      await con.query("select * from users;", (err, result) => {
+        if (err) console.log(err);
+        console.log(result);
+        res.render("admin", {
+          members: result,
+        });
+      });
+    });
+  });
+};
+
+//To display the page when a user successfully registers for a sport
+app.get("/success-register", (req, res) => {
+  con.query(
+    `select * from batch where b_id="${success_b_id}";`,
+    (err, result) => {
+      if (err) console.log(err);
+      success_b_coach = result[0].b_coach;
+    }
+  );
+  con.query(
+    `insert into registrations values("${success_username}","${success_sports_name}",${success_b_id},${success_t_id})`
+  );
+  con.query(
+    `update users set s_name="${success_sports_name}" where username="${success_username}"`
+  );
+  res.render("celebration", {
+    s_sname: success_sports_name,
+    s_uname: success_username,
+  });
+});
+
+const enroll = () => {
+  document.querySelector(".enroll").addEventListener("click", () => {
+    prompt("You have been enrolled!");
+  });
+};
+//-------------------------------------------------------------------------------------------------------
 
 app.listen(port, () => {
   console.log(`Listening to port ${port}`);

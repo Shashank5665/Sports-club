@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="tournaments.css" />
+    <title>Tournaments</title>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-light primary"
+      style="background-color: rgb(133, 133, 133)"
+    >
+      <a style="color: white" class="navbar-brand" href="#">🔰SPORTS CLUB🔰</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a
+              style="color: white"
+              class="nav-link"
+              href="/sports/<%=username%>"
+              >Home <span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a style="color: white" class="nav-link" href="/tournaments"
+              >Tournaments</a
+            >
+          </li>
+          <li class="nav-item">
+            <a style="color: white" class="nav-link" href="/login"
+              ><%=Login%></a
+            >
+          </li>
+          <li class="nav-item">
+            <a style="color: white" class="nav-link" href="/signup"
+              ><%=Register%></a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              style="color: white"
+              class="nav-link"
+              href="/profile/<%=username%>"
+              ><%= myprofile %></a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      <!-- <div class="current">
+        <p class="heading">Current Tournaments</p>
+        <div class="element">
+          <p>Football U19 state level</p>
+        </div>
+        <div class="element">
+          <p>Football U19 state level</p>
+        </div>
+      </div> -->
+      <div class="upcoming">
+        <p class="heading">Upcoming Tournaments</p>
+        <% t_details.forEach((el) => {%>
+        <div class="element">
+          <p><%= el.t_name %></p>
+          <button class="enroll" onclick="enroll()">Enroll</button>
+        </div>
+        <% })%>
+      </div>
+    </div>
+    <script>
+      document.querySelector(".enroll").addEventListener("click", () => {
+        alert("You have been enrolled");
+      });
+    </script>
+  </body>
+</html>

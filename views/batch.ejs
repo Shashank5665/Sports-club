@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/batch.css" />
+    <title>Batch</title>
+  </head>
+  <body>
+    <div class="heading">
+      <p class="heading_name"><%= sports_name %></p>
+    </div>
+    <div class="row">
+      <div class="outer_row">
+        <% b_details.forEach((el) => {%>
+        <div class="inner_row">
+          <div class="card">
+            <p class="bno">Batch - <%= el.b_number %></p>
+            <p>coach : <%= el.b_coach %></p>
+            <p>Day : <%= el.b_day %></p>
+            <p>Timings : <%= el.b_timings %></p>
+            <p>Members filled : <%= el.b_members %></p>
+            <button class="join" onclick="joined()">Join</button>
+          </div>
+        </div>
+        <% })%>
+      </div>
+    </div>
+    <script>
+      function joined() {
+        window.location = "/success-register";
+      }
+      document.getElementsByClassName("join").addEventListener("click", hello);
+    </script>
+  </body>
+</html>
