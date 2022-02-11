@@ -315,6 +315,17 @@ app.get("/success-register", (req, res) => {
   });
 });
 
+//Admin can delete the tournaments
+app.get("/delete/:id", (req, res) => {
+  con.query(
+    `DELETE FROM tournaments WHERE t_id=${req.params.id}`,
+    (err, result) => {
+      if (err) console.log(err);
+      res.redirect("/admin-tournaments");
+    }
+  );
+});
+
 const enroll = () => {
   document.querySelector(".enroll").addEventListener("click", () => {
     prompt("You have been enrolled!");

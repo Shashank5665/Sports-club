@@ -446,3 +446,25 @@ nav .profile-details i {
   text-decoration: none;
   color: white;
 }
+.del-btn {
+  width: 125px;
+  height: 27px;
+  background-color: rgb(231, 29, 56);
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 3px 3px 0px 0px rgb(173, 0, 38);
+  border-radius: 3px;
+  text-decoration: none;
+}
+.del-btn:hover {
+  text-decoration: none;
+  color: white;
+}
+.start-boxes {
+  display: flex;
+  justify-content: flex-start;
+}
