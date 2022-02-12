@@ -72,7 +72,11 @@ app.post("/signup", async (req, res) => {
       req.body.username +
       "','" +
       req.body.password +
-      "')",
+      "'," +
+      null +
+      "," +
+      null +
+      ")",
     (err, result) => {
       if (err) {
         throw err;
@@ -212,27 +216,6 @@ app.get("/admin-tournaments", async (req, res) => {
   });
 });
 
-// app.get("/delete-tournaments", async (req, res) => {
-//   con.query("select * from tournaments;", (err, result) => {
-//     if (err) console.log(err);
-//     console.log(result);
-//     res.render("admin-tournaments", {
-//       tournament: result,
-//     });
-//   });
-// });
-
-// app.get("/delete-tournaments", async (req, res) => {
-//   con.query(
-//     `delete * from tournaments where t_name=${this.Attr("class")};`,
-//     (err, result) => {
-//       if (err) console.log(err);
-//       console.log(result);
-//       res.redirect("/admin-tournaments");
-//     }
-//   );
-// });
-
 //To display the tournaments
 app.get("/tournaments", async (req, res) => {
   await con.query("select * from tournaments;", (err, result) => {
@@ -276,7 +259,7 @@ app.get("/profile/:username", (req, res) => {
       Login: "",
       Register: "",
       sports_name: user.s_name,
-      tour_name: "",
+      tour_name: user.t_name,
     });
   });
 });
@@ -326,11 +309,22 @@ app.get("/delete/:id", (req, res) => {
   );
 });
 
-const enroll = () => {
-  document.querySelector(".enroll").addEventListener("click", () => {
-    prompt("You have been enrolled!");
-  });
-};
+//To enroll the user to the particular tournament
+app.get("/batch-enroll/:id", (req, res) => {
+  con.query(
+    `update users set t_name=(select t_name from tournaments where t_id=${req.params.id}) where username="${uname}"`
+  );
+  con.query(
+    `UPDATE registrations
+    SET t_id=${req.params.id}
+    WHERE username="${uname}";`,
+    (err, result) => {
+      if (err) console.log(err);
+      res.redirect(`/profile/${uname}`);
+    }
+  );
+});
+
 //-------------------------------------------------------------------------------------------------------
 
 app.listen(port, () => {

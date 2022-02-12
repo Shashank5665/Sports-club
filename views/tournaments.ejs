@@ -81,7 +81,7 @@
         <% t_details.forEach((el) => {%>
         <div class="element">
           <p><%= el.t_name %></p>
-          <button class="enroll" onclick="enroll()">Enroll</button>
+          <a class="enroll" href="/batch-enroll/<%=el.t_id%>">Enroll</a>
         </div>
         <% })%>
       </div>

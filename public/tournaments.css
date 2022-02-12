@@ -55,3 +55,26 @@ p {
   margin: 5px 20px 5px 20px;
   color: rgb(17, 17, 109);
 }
+.enroll {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 125px;
+  height: 40px;
+  background-color: rgb(0, 109, 233);
+  border-radius: 3px;
+  color: white;
+  font-size: 16px;
+  margin-right: 20px;
+  text-decoration: none;
+  flex-direction: column;
+}
+.enroll:hover {
+  color: white;
+  text-decoration: none;
+  background-color: rgb(0, 174, 255);
+}
+
+.box {
+  margin-left: 50px;
+}
