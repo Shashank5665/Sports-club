@@ -1,1 +1,1 @@
-# Sports-club
+# Sports club management system
