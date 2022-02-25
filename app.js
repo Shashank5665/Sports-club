@@ -282,20 +282,33 @@ app.get("/success-register", (req, res) => {
   con.query(
     `select * from batch where b_id="${success_b_id}";`,
     (err, result) => {
-      if (err) console.log(err);
+      if (err) {
+        res.send("You have already been enrolled!");
+      }
       success_b_coach = result[0].b_coach;
     }
   );
   con.query(
-    `insert into registrations values("${success_username}","${success_sports_name}",${success_b_id},${success_t_id})`
-  );
-  con.query(
     `update users set s_name="${success_sports_name}" where username="${success_username}"`
   );
-  res.render("celebration", {
-    s_sname: success_sports_name,
-    s_uname: success_username,
-  });
+  con.query(
+    `insert into registrations values("${success_username}","${success_sports_name}",${success_b_id},${success_t_id})`,
+    (err, result) => {
+      if (err) {
+        res.set("Content-Type", "text/html");
+        res.send(
+          Buffer.from(
+            `<h1 style='color: red;font-family: poppins'>You have alreday been enrolled!</h1>`
+          )
+        );
+      } else {
+        res.render("celebration", {
+          s_sname: success_sports_name,
+          s_uname: success_username,
+        });
+      }
+    }
+  );
 });
 
 //Admin can delete the tournaments
